@@ -81,6 +81,7 @@ func newRootCmd(version string, exit func(int)) *rootCmd {
 	}
 
 	cmd.PersistentFlags().BoolVar(&root.debug, "debug", false, "Enable debug mode")
+	cmd.PersistentFlags().String("mirror", "", "Prefix GitHub asset download URLs with a mirror URL")
 	cmd.AddCommand(
 		newInstallCmd().cmd,
 		newEnsureCmd().cmd,

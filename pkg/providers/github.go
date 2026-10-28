@@ -68,6 +68,9 @@ func (g *gitHub) Fetch(opts *FetchOpts) (*File, error) {
 	}
 
 	gf.ExtraHeaders = map[string]string{"Accept": "application/octet-stream"}
+	if opts.Mirror != "" {
+		gf.URL = strings.TrimRight(opts.Mirror, "/") + "/" + gf.URL
+	}
 	if g.token != "" {
 		gf.ExtraHeaders["Authorization"] = fmt.Sprintf("token %s", g.token)
 	}

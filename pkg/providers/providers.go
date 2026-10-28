@@ -32,6 +32,7 @@ func (f *File) Hash() ([]byte, error) {
 }
 
 type FetchOpts struct {
+	Mirror         string
 	All            bool
 	PackageName    string
 	PackagePath    string

@@ -77,7 +77,9 @@ func newEnsureCmd() *ensureCmd {
 				}
 				log.Debugf("Using provider '%s' for '%s'", p.GetID(), binCfg.URL)
 
+				mirror, _ := cmd.Flags().GetString("mirror")
 				pResult, err := p.Fetch(&providers.FetchOpts{
+					Mirror:             mirror,
 					Version:            binCfg.Version,
 					PackageName:        binCfg.RemoteName,
 					PackagePath:        binCfg.PackagePath,

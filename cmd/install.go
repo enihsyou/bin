@@ -61,7 +61,8 @@ func newInstallCmd() *installCmd {
 			}
 			log.Debugf("Using provider '%s' for '%s'", p.GetID(), u)
 
-			pResult, err := p.Fetch(&providers.FetchOpts{All: root.opts.all, NamePattern: root.opts.name})
+			mirror, _ := cmd.Flags().GetString("mirror")
+			pResult, err := p.Fetch(&providers.FetchOpts{All: root.opts.all, NamePattern: root.opts.name, Mirror: mirror})
 			if err != nil {
 				return err
 			}

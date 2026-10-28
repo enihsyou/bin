@@ -1,9 +1,35 @@
 package providers
 
 import (
+	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"testing"
+
+	"github.com/google/go-github/v31/github"
 )
+
+func TestGitHubFetchMirror(t *testing.T) {
+	const assetURL = "https://api.github.com/repos/owner/repo/releases/assets/123"
+	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.URL.Path == "/repos/owner/repo/releases/latest" {
+			fmt.Fprintf(w, `{"tag_name":"v1","assets":[{"name":"binary","url":%q}]}`, assetURL)
+			return
+		}
+		if r.RequestURI != "/"+assetURL || r.Header.Get("Authorization") != "token secret" || r.Header.Get("Accept") != "application/octet-stream" {
+			t.Errorf("unexpected download request: %s, headers %v", r.RequestURI, r.Header)
+		}
+		fmt.Fprint(w, "binary content")
+	}))
+	defer server.Close()
+	client := github.NewClient(server.Client())
+	client.BaseURL, _ = url.Parse(server.URL + "/")
+	g := &gitHub{client: client, owner: "owner", repo: "repo", token: "secret"}
+	if _, err := g.Fetch(&FetchOpts{Mirror: server.URL + "/", PackageName: "binary"}); err != nil {
+		t.Fatal(err)
+	}
+}
 
 func TestNewGitHub(t *testing.T) {
 	cases := []struct {
